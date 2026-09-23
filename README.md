@@ -1,4 +1,4 @@
-# FileFormats Vendor Australian Imaging Service
+# FileFormats - Australian Imaging Service
 
 [![CI/CD](https://github.com/australian-imaging-service/fileformats-vendor-australianimagingservice/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/australian-imaging-service/fileformats-vendor-australianimagingservice/actions/workflows/ci-cd.yml)
 [![Codecov](https://codecov.io/gh/australian-imaging-service/fileformats-vendor-australianimagingservice/branch/main/graph/badge.svg?token=UIS0OGPST7)](https://codecov.io/gh/australian-imaging-service/fileformats-vendor-australianimagingservice)
