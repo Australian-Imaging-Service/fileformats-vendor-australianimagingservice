@@ -1,4 +1,5 @@
-from fileformats.image import Dicom, Gif
+from fileformats.application import Dicom
+from fileformats.image import Gif
 from fileformats.medimage.base import MedicalImage
 
 

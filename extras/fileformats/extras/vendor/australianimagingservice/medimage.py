@@ -14,9 +14,9 @@ from fileformats.vendor.australianimagingservice.medimage import (
 
 
 @converter
-@python.define(outputs=["out_file"])  # type: ignore[untyped-decorator]def SnapshotDicomCollection(
+@python.define(outputs=["out_file"])  # type: ignore[untyped-decorator]
 def SnapshotZippedDicomCollection(
-    in_file: Zip[DicomSeries],
+    in_file: Zip[DicomSeries],  # type: ignore[type-arg]
 ) -> XnatSnapshot:
     """Snapshots of a DICOM collection for display in XNAT's UI
 
@@ -41,9 +41,9 @@ def SnapshotZippedDicomCollection(
 
 
 @converter
-@python.define(outputs=["out_file"])  # type: ignore[untyped-decorator]def SnapshotDicomCollection(
+@python.define(outputs=["out_file"])  # type: ignore[untyped-decorator]
 def SampleZippedDicomCollection(
-    in_file: Zip[DicomSeries],
+    in_file: Zip[DicomSeries],  # type: ignore[type-arg]
 ) -> DicomSample:
     """Samples a DICOM collection from a zipped DICOM collection
 
