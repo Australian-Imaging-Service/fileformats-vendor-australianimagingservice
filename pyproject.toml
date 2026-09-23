@@ -7,7 +7,7 @@ name = "fileformats-vendor-australianimagingservice"
 description = "Classes for representing different file formats in Python classes for use in type hinting in data workflows"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["fileformats >= 0.17"]
+dependencies = ["fileformats >= 0.17", "fileformats-medimage"]
 license = { file = "LICENSE" }
 authors = [{ name = "Thomas G. Close", email = "tom.g.close@gmail.com" }]
 maintainers = [{ name = "Thomas G. Close", email = "tom.g.close@gmail.com" }]

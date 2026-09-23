@@ -9,6 +9,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fileformats >= 0.17",
+    "fileformats-medimage",
     "pydra >= 1.0a9"
 ]
 license = {file = "LICENSE"}
