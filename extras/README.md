@@ -1,14 +1,14 @@
-# FileFormats-Vendor-CHANGEME Extras
+# FileFormats-Vendor-australianimagingservice Extras
 
 This is a extras module for the
-[fileformats-vendor-CHANGEME](<https://github.com/ArcanaFramework/fileformats-vendor-CHANGEME) package, which provides additional functionality to format classes (i.e. aside from basic identification
+[fileformats-vendor-australianimagingservice](<https://github.com/ArcanaFramework/fileformats-vendor-australianimagingservice) package, which provides additional functionality to format classes (i.e. aside from basic identification
 and validation), such as conversion tools, metadata parsers, test data generators, etc...
 
 ## Quick Installation
 
 This extension can be installed for Python 3 using *pip*::
 
-    $ pip3 install fileformats-vendor-CHANGEME-extras
+    $ pip3 install fileformats-vendor-australianimagingservice-extras
 
 This will install the core package and any other dependencies
 
