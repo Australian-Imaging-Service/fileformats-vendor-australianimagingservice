@@ -3,12 +3,12 @@ from pathlib import Path
 
 import pytest
 from fileformats.application import Zip
-from fileformats.medimage import DicomImage, DicomSeries
+from fileformats.medimage import DicomDir, DicomImage
 from fileformats.vendor.australianimagingservice import DicomSample
 
 from fileformats.extras.vendor.australianimagingservice.medimage import (
+    SampleDicomDir,
     select_dicom_sample,
-    zip_dicom_series,
 )
 
 
@@ -18,36 +18,47 @@ def _dicom(path: Path, payload: bytes) -> Path:
     return path
 
 
-def test_dicom_series_converters_are_registered() -> None:
+def test_directory_uses_generic_zip_and_vendor_sample() -> None:
     assert issubclass(DicomSample, DicomImage)
-    assert Zip[DicomSeries].get_converter(DicomSeries) is not None
-    assert DicomSample.get_converter(DicomSeries) is not None
+    zip_converter = Zip[DicomDir].get_converter(DicomDir)
+    assert zip_converter is not None
+    assert type(zip_converter.task).__name__ == "create_zip"
+    sample_converter = DicomSample.get_converter(DicomDir)
+    assert sample_converter is not None
+    assert isinstance(sample_converter.task, SampleDicomDir)
 
 
-def test_zip_and_sample_are_derived_from_the_same_series(tmp_path: Path) -> None:
-    first = _dicom(tmp_path / "source" / "a" / "001.dcm", b"first")
-    second = _dicom(tmp_path / "source" / "b" / "002.dcm", b"second")
-    series = DicomSeries([second, first])
+def test_zip_and_sample_come_from_same_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("PYDRA_HASH_CACHE", str(tmp_path / "pydra-hashes"))
+    first = _dicom(tmp_path / "source" / "001.dcm", b"first")
+    second = _dicom(tmp_path / "source" / "002.dcm", b"second")
+    directory = DicomDir(tmp_path / "source")
 
-    sample = select_dicom_sample(series)
-    archive = zip_dicom_series(series, tmp_path / "series.zip")
+    archive = Zip[DicomDir].convert(
+        directory,
+        out_file=tmp_path / "converted.zip",
+        compression="ZIP_STORED",
+    )
+    sample = DicomSample.convert(directory, out_file=tmp_path / "sample")
 
-    assert sample == first
+    assert isinstance(archive, Zip[DicomDir])
+    assert select_dicom_sample(directory) == first
     with zipfile.ZipFile(archive) as zf:
-        assert zf.namelist() == ["a/001.dcm", "b/002.dcm"]
-        assert zf.read("a/001.dcm") == sample.read_bytes()
-        assert zf.read("b/002.dcm") == second.read_bytes()
+        assert zf.read("source/001.dcm") == sample.fspath.read_bytes()
+        assert zf.read("source/002.dcm") == second.read_bytes()
 
 
 def test_sample_selection_excludes_dicomdir(tmp_path: Path) -> None:
-    dicomdir = _dicom(tmp_path / "source" / "DICOMDIR", b"directory")
+    _dicom(tmp_path / "source" / "DICOMDIR", b"directory")
     image = _dicom(tmp_path / "source" / "image.dcm", b"image")
 
-    assert select_dicom_sample(DicomSeries([dicomdir, image])) == image
+    assert select_dicom_sample(DicomDir(tmp_path / "source")) == image
 
 
 def test_sample_selection_fails_without_regular_image(tmp_path: Path) -> None:
-    dicomdir = _dicom(tmp_path / "source" / "DICOMDIR", b"directory")
+    _dicom(tmp_path / "source" / "DICOMDIR", b"directory")
 
     with pytest.raises(ValueError, match="No sample DICOM"):
-        select_dicom_sample(DicomSeries([dicomdir]))
+        select_dicom_sample(DicomDir(tmp_path / "source"))
