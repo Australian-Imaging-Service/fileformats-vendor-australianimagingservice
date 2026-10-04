@@ -2,64 +2,34 @@
 # fileformats.vendor.australianimagingservice.medimage here, see
 # https://arcanaframework.github.io/fileformats/developer/extras.html
 
+import shutil
+import typing as ty
+from pathlib import Path
+
 from fileformats.core import converter
-from fileformats.application import Zip
-from fileformats.medimage import DicomSeries
+from fileformats.medimage import DicomCollection
 from pydra.compose import python
 
 from fileformats.vendor.australianimagingservice.medimage import (
     DicomSample,
-    XnatSnapshot,
 )
 
 
 @converter
 @python.define(outputs=["out_file"])  # type: ignore[untyped-decorator]
-def SnapshotZippedDicomCollection(
-    in_file: Zip[DicomSeries],  # type: ignore[type-arg]
-) -> XnatSnapshot:
-    """Snapshots of a DICOM collection for display in XNAT's UI
-
-    Parameters
-    ----------
-    in_file : Zip[DicomSeries]
-        the input zipped DICOM series to create snapshots from
-
-    Returns
-    -------
-    out_file: XnatSnapshot
-        the resulting XNAT snapshot of the DICOM collection
-
-    Raises
-    ------
-    ValueError
-        when mutually exclusive "extract_volume" and "to_4d" options are provided
-    """
-    raise NotImplementedError(
-        "SnapshotDicomCollection converter is not yet implemented"
-    )
-
-
-@converter
-@python.define(outputs=["out_file"])  # type: ignore[untyped-decorator]
-def SampleZippedDicomCollection(
-    in_file: Zip[DicomSeries],  # type: ignore[type-arg]
+def SampleDicomDir(
+    in_file: DicomCollection,
+    out_file: ty.Optional[Path] = None,
 ) -> DicomSample:
-    """Samples a DICOM collection from a zipped DICOM collection
+    """Copy a representative image directly from a DICOM directory.
 
-    Parameters
-    ----------
-    in_file : Zip[DicomSeries]
-        the input zipped DICOM series to create a sample from
-
-    Returns
-    -------
-    out_file: DicomSample
-        the resulting sample of the DICOM collection
-
-    Raises
-    ------
-    ValueError
-        when mutually exclusive "extract_volume" and "to_4d" options are provided
+    Packaging invokes the generic ZIP and sample converters from the same
+    deidentified source, so the sampled bytes also occur in the archive.
     """
-    raise NotImplementedError("SampleDicomCollection converter is not yet implemented")
+    sample = in_file.contents[0]
+    if out_file is None:
+        out_file = Path.cwd() / f"{sample.stem}-sample"
+    out_file = out_file.absolute()
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(sample, out_file)
+    return DicomSample(out_file)
